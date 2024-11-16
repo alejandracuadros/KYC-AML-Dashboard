@@ -1,0 +1,38 @@
+** EU High- Risk Third Coutries List **
+
+This document provides the list of high-risk third countries identified by the EU, classified by their level of deficiences in anti-money laudering (AML)
+and counter - terrorism financing (CFT) frameworks.
+
+** Category I: High- Risk Third Countries with Commitments **
+
+- Afghanistan
+- Barbados
+- Burkina Faso
+- Camerron
+- Democratic Republic of Congo
+- Gibraltar
+- haiti
+- Jamaica
+- Mali
+- Mozambique
+_ Myanmar
+- Nigeria
+- Panama
+_ Philippines
+- Senegal
+- South Africa
+- South Sudan
+- Syria
+- Tanzania
+- Trinidad and Tobago
+- Uganda
+- United Arab Emirates
+- Vanuatu
+- vietnam
+- Yemen
+
+** Category II: High-Risk Third Countries Seeking Technical Assistance **
+- Iran
+
+** Category III: High - Risk Third Countries with Ongoing Risks
+- Democratic People`s Republic Korea (DPRK)
