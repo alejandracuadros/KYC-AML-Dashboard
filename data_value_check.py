@@ -1,6 +1,6 @@
 # check if in there are any empty (NULL) values in a given column in a specific table in a database
 #The goal of this function, is to make sure that all the information are complete, since these are critical when comes to AML/KYC checking
-from multiprocessing import connection
+
 
 
 def validate_data(field_name, value, expected_type):
