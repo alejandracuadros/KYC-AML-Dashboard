@@ -1,0 +1,4 @@
+python -m streamlit run app.py
+
+- There is a .csv where all the credentials are create
+- app.py works with streamlit
