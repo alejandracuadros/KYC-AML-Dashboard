@@ -1,17 +1,17 @@
 # CFG-Group-project-group-3
 
-Automataed Eligibility and Compliance Checker
+Automated Eligibility and Compliance Checker
 
 Project Description
-This project is an automated system designed to evaluate startups applying to MOgan Stanley`s Inclusive Venture Lab. It ensures they meet regulatory and eligibility requirements, including:
-- Anti - Money Laudering (AML) complianc
+This project is an automated system designed to evaluate startups applying to Morgan Stanley's Inclusive Venture Lab. It ensures they meet regulatory and eligibility requirements, including:
+- Anti - Money Laundering (AML) compliance
 - Politically Exposed Persons (PEP) checks
 - Eligibility criteria based on funding stage, diversity, sustainability
 
 The program includes:
 - SQL database integration for structured data storage.
 - Compliance reporting for Morgan Stanley analysts.
-- A frontend dashboboard for user interaction.
+- A frontend dashboard for user interaction.
 
 Objectives:
 
@@ -21,43 +21,50 @@ Objectives:
 
 Deliverables
 
-SQL Database: Includes tables for startups, founders, high-risk countries and PEPS.
-Python Scripts: Eligibility and AML compliance checks, Error handling and validation, report generation.
-
-Frontend Dashboard: Displays compliance results and provides interaction for analysts and startups.
-
-PEP and High-Risk Third Countries Integration: Startups indicate if their founders or high manageral personnel and their close relatives are PEPs. Or if the startup is set up or operating in a high-risk third country.
+- SQL Database: Includes tables for startups, founders, high-risk countries and PEPS.
+- Python Scripts: Eligibility and AML compliance checks, Error handling and validation, report generation.
+- Frontend Dashboard: Displays compliance results and provides interaction for analysts and startups.
+- PEP and High-Risk Third Countries Integration: Startups indicate if their founders or high manageral personnel and their close relatives are PEPs. Or if the startup is set up or operating in a high-risk third country.
 
 Setup Instructions:
 
-- Python 3.x above
+1. Install Python 3.x above.
+2. Install the required libraries from the `requirements.txt` file using the command below:
+   `pip install -r requirements.txt`
+4. Ensure you have the following dependencies:
 - Flask
 - MySQL
-- Python library: requirements
+- Pandas
+- Streamlit
+4. Set up the database using the SQL scripts in the `sql/` directory.
+
+  
 
 PEP handling 
 
-Politically Exposed Persons (PEPs) includes individuals in prominent goverment positions, state-owned enterprises, or high-ranking military roles and immediate family members (spouses, children, parents, siblings, who may also present heightened compliance risks).
+Politically Exposed Persons (PEPs) includes individuals in prominent government positions, state-owned enterprises, or high-ranking military roles and immediate family members (spouses, children, parents, siblings, etc) who may also present heightened compliance risks.
+
 Implementations:
-During startup registration, user indicate PEP status, and this information is accessed, stored and factored into the compliancecheck.
+During startup registration, user indicate PEP status, and this information is accessed, stored and factored into the compliance check.
 
 Country Handling
 
-During registration it should be identified if the founder/CEO is from a high-risk country, check if the startup is based in a high-risk country and if the startup operates or not in a high-risk country.
+During registration, it should identify if the founder/CEO is from a high-risk country, check if the startup is based in a high-risk country and if the startup operates in a high-risk country.
 
 Frontend for startups
 
-Allows startups to register and input their data such as PEP status, operational countries.
-In here is possible to receive immediate results and eligibility feedback and flag any isssues with their application.
+- Startups can register and input their data such as PEP status, operational countries.
+- Startups can receive immediate results and eligibility feedback and flag any issues in their application.
 
 Frontend for Analysts
-Provides analysts with detailed access to all compliance data for decision-making, including advanced tools for risk assessment and reporting.
-Here the anaysts can view the PEP statuses, flagged countries, risk scores. 
-And generating  report in formats like PDF or CVS for external use, also allows to add notes or comments to individual startup profiles, while highlighting startups with high-risk scores or incomplete compliance.
-It can have a restrict access to authorized analysts.
+- Analysts can have detailed access to all compliance data for decision-making, including advanced tools for risk assessment and reporting.
+- Analysts can view the PEP statuses, flagged countries, risk scores. 
+- Generate  report in formats like PDF or CVS for external use.
+- Analysts can also add notes or comments to individual startup profiles, while highlighting startups with high-risk scores or incomplete compliance.
+- It can have access restrictions to only authorized analysts.
 
 Data Privacy and GDPR compliance
-Even thou this is a student project, it will adhere to GDPR requirements to ensure the secure and lawful handling of personal data. 
+Even though this is a student project, it will adhere to GDPR requirements to ensure the secure and lawful handling of personal data. 
 
 Directory Structure
 
@@ -96,10 +103,13 @@ project_root/
 │ ├── dashboard.html # Analyst dashboard to view startups │ 
 │ ├── profile.html 
 
-#test eligibility and AML logic          
-├── tests/
-│   ├── test_eligibility.py     
-│   └── test_aml.py        
+#unit tests          
+├── tests/     
+│   ├── test_PEP_API.py         
+│   ├── test_app.py             
+│   ├── test_data_value_check.py
+│   ├── test_startup_data_management.py
+# Sample report     
 #sample report     
 └── reports/
     └── compliance_report.pdf  
