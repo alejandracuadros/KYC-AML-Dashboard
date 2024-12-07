@@ -1,5 +1,4 @@
-from unittest import TestCase
-from unittest.mock import patch
+from unittest import TestCase, mock
 import pandas as pd
 import app
 
@@ -8,7 +7,7 @@ import app
 class TestApp(TestCase):
 
     # this test checks if usernames and passwords are stored correctly
-    @patch('app.pd.read_csv')
+    @mock.patch('app.pd.read_csv')
     def test_load_credentials(self, mock_read_csv):
         mock_read_csv.return_value = pd.DataFrame({'username': ['admin'], 'password': ['safepassword']})
         credentials = app.load_credentials()
@@ -16,11 +15,11 @@ class TestApp(TestCase):
         self.assertEqual(credentials['username'][0], 'admin')
 
     # this test checks if a user with their valid username and password can log in
-    @patch('app.st.session_state', new_callable=dict)
-    @patch('app.st.text_input', return_value='user')
-    @patch('app.st.button')
-    @patch('app.st.success')
-    @patch('app.st.error')
+    @mock.patch('app.st.session_state', new_callable=dict)
+    @mock.patch('app.st.text_input', return_value='user')
+    @mock.patch('app.st.button')
+    @mock.patch('app.st.success')
+    @mock.patch('app.st.error')
     def test_login_success(self, mock_error, mock_success, mock_button, mock_text_input, mock_session_state):
         mock_session_state['logged_in'] = False
         mock_session_state['selected_section'] = 'Home'
@@ -43,11 +42,11 @@ class TestApp(TestCase):
         mock_success.assert_called_once_with("Login successful!")
 
     # this test checks if a user with an invalid username and/or password is prohibited from logging in
-    @patch('app.st.session_state', new_callable=dict)
-    @patch('app.st.text_input', side_effect=['user', 'wrongpassword'])
-    @patch('app.st.button')
-    @patch('app.st.success')
-    @patch('app.st.error')
+    @mock.patch('app.st.session_state', new_callable=dict)
+    @mock.patch('app.st.text_input', side_effect=['user', 'wrongpassword'])
+    @mock.patch('app.st.button')
+    @mock.patch('app.st.success')
+    @mock.patch('app.st.error')
     def test_login_failure(self, mock_error, mock_success, mock_button, mock_text_input, mock_session_state):
         mock_session_state['logged_in'] = False
         app.credentials = pd.DataFrame({'username': ['user'], 'password': ['safepassword']})

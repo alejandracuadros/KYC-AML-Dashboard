@@ -64,7 +64,7 @@ class TestSearchPEPAPI(TestCase):
         }
 
         mock_post.return_value = mock_response
-        search_pep("unknown person")
+        search_pep("Anonymous")
         expected = "No matches found."
         result = mock_print.call_args[0][0]
         self.assertEqual(expected, result)
