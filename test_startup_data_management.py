@@ -1,5 +1,4 @@
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest import TestCase, mock
 from startup_data_management import check_null_startup_data, check_invalid_funding_stages, insert_new_startup
 
 # these unittests use mocking to mock the interaction between the API and the database
@@ -7,12 +6,11 @@ from startup_data_management import check_null_startup_data, check_invalid_fundi
 class TestStartupDataManagement(TestCase):
 
     # checking that the function returns the expected value after executed
-    @patch('startup_data_management._connect_to_db')
-    @patch('startup_data_management.close_db_connection')
-    def test_check_null_startup_data(self, mock_connect_to_db, mock_close_db_connection):
-        mock_connection = MagicMock()
+    @mock.patch('startup_data_management._connect_to_db')
+    def test_check_null_startup_data(self, mock_connect_to_db):
+        mock_connection = mock.MagicMock()
         mock_connect_to_db.return_value = mock_connection
-        mock_cursor = MagicMock()
+        mock_cursor = mock.MagicMock()
         mock_connection.cursor.return_value = mock_cursor
         mock_cursor.fetchone.return_value = 3
 
@@ -22,12 +20,11 @@ class TestStartupDataManagement(TestCase):
         self.assertEqual(mock_cursor.fetchone(), 3)
 
     # checking that the function returns those startups correctly where there is not enough funding
-    @patch('startup_data_management._connect_to_db')
-    @patch('startup_data_management.close_db_connection')
-    def test_check_invalid_funding_stages(self, mock_connect_to_db, mock_close_db_connection):
-        mock_connection = MagicMock()
+    @mock.patch('startup_data_management._connect_to_db')
+    def test_check_invalid_funding_stages(self, mock_connect_to_db):
+        mock_connection = mock.MagicMock()
         mock_connect_to_db.return_value = mock_connection
-        mock_cursor = MagicMock()
+        mock_cursor = mock.MagicMock()
         mock_connection.cursor.return_value = mock_cursor
         mock_cursor.fetchall.return_value = [(1, 'Startup A', 'invalid'), (2, 'Startup B', 'also invalid')]
 
@@ -37,12 +34,11 @@ class TestStartupDataManagement(TestCase):
         self.assertEqual(mock_cursor.fetchall(), [(1, 'Startup A', 'invalid'), (2, 'Startup B', 'also invalid')])
 
     # checking that a new startup with valid funding stage can be inserted correctly
-    @patch('startup_data_management._connect_to_db')
-    @patch('startup_data_management.close_db_connection')
-    def test_insert_new_startup(self, mock_close_db_connection, mock_connect_to_db):
-        mock_connection = MagicMock()
+    @mock.patch('startup_data_management._connect_to_db')
+    def test_insert_new_startup(self, mock_connect_to_db):
+        mock_connection = mock.MagicMock()
         mock_connect_to_db.return_value = mock_connection
-        mock_cursor = MagicMock()
+        mock_cursor = mock.MagicMock()
         mock_connection.cursor.return_value = mock_cursor
 
         insert_new_startup(mock_connection, 'Startup C', 'Canada', 'Frank Malicious', 'Tech', 'IPO', True)
