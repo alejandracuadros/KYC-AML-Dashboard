@@ -2,5 +2,5 @@
 # Update the parameters with your database credentials
 
 HOST = "localhost"
-USER = "your_username"
-PASSWORD = "your_password"
+USER = "root"
+PASSWORD = "#Almeja1997."
