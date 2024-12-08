@@ -12,50 +12,6 @@ db = DatabaseConnection()
 def load_credentials():
     return pd.read_csv("login_credentials.csv")
 
-
-# Styling of the app
-def inject_css():
-    st.markdown(
-        """
-        <style>
-
-        /* Change the header color */
-        .stAppHeader {
-            background-color: #021021;
-            font-family: 'Arial', sans-serif;
-        }
-
-        /* Change the main background color */
-        .stApp {
-            background-color: #021021;
-            font-family: 'Arial', sans-serif;  
-        }
-
-        /* Change sidebar background color */
-        .stSidebar { 
-            background-color: #05254F; 
-            color: white ; 
-            font-family: 'Arial', sans-serif;
-        }
-
-        /* Customize submit button */
-        button {
-            background-color: #073470 !important;
-            color: white !important;
-            font-family: 'Arial', sans-serif; 
-        }
-        button:hover {
-            background-color: #135F91 !important; 
-        }
-
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-=======
-
 def inject_css():
         st.markdown(
             """
@@ -335,9 +291,6 @@ else:
                                 "Medium Enterprise (50-249 employees)": (50, 249),
                                 "Large Enterprise (250 or more employees)": (250, float('inf'))
                                 }
-
-        }
-
 
         if "company_size" not in st.session_state:
             st.session_state.company_size = list(company_size_options.keys())[0]
