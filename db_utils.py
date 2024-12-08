@@ -11,6 +11,7 @@ class DbConnectionError(Exception):
 # Connecting to mysql database
 def _connect_to_db(db_name):
     try:
+
         cnx = mysql.connector.connect(
             host=HOST,
             user=USER,
@@ -18,8 +19,10 @@ def _connect_to_db(db_name):
             auth_plugin='mysql_native_password',
             database=db_name
         )
+
         return cnx
     except mysql.connector.Error as err:
+
         raise DbConnectionError(f"Error: {err}")
 
 
