@@ -3,9 +3,9 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 import pycountry
-# from add_to_database import DatabaseConnection  # type: ignore
+from add_to_database import DatabaseConnection  # type: ignore
 
-# db = DatabaseConnection()
+db = DatabaseConnection()
 
 # Login function
 @st.cache_data
