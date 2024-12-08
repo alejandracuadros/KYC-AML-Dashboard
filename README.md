@@ -36,9 +36,20 @@ Setup Instructions:
    - MySQL
    - Pandas
    - Streamlit
-4. Set up the database using the SQL scripts.
+4. Set up the database manually using the provided SQL scripts:
+   
+   4.1. Start by executing the SQL script located in the file `regulatory_compliance_data.sql`.
+   
+   4.2. Next, execute the SQL script located in the file `database_population.sql`.
 
-  
+Running the project:
+
+- To run the *Client Interface*, open the terminal and use the command:  `streamlit run app.py`
+
+- To run the *Analyst Dashboard*, open the terminal and use the command: `streamlit run dashboard.py`
+
+Note: Login credentials for both interfaces are stored in the login_credentials.csv file.
+
 
 PEP handling 
 
