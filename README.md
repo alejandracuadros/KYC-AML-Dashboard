@@ -70,48 +70,48 @@ Directory Structure
 
 project_root/
 #SQL schema
-├── sql/
+├── sql/  
 │   ├── create_tables.sql      
 │   ├── insert_data.sql        
 │   ├── queries.sql           
  # High-risk country data and # Placeholder for PEPs
 
-├── data/
-│   ├── high_risk_countries.txt 
+├── data/  
+│   ├── high_risk_countries.txt  
 │   └── pep_list_placeholder.txt
 
 # Requirements and objectives
 
-├── docs/
+├── docs/  
 │   ├── requirements.md         
 │   └── compliance_guidelines.pdf
 # Eligibility checks, AML checks connections with SQL
-├── scripts/
+├── scripts/  
 │   ├── eligibility_checks.py  
 │   ├── aml_compliance.py       
 │   ├── database_connector.py   
 │   ├── app.py        
 # Frontend for startups
-├── frontend/ # Frontend components 
-│ ├── startup/ │ 
-│ ├── register.html 
+├── frontend/ # Frontend components  
+│ ├── startup/ │  
+│ ├── register.html  
 │ │ ├── status.html
 
 # Frontend for analysts showing the startup profile 
 
-│ ├── analyst/│ 
-│ ├── dashboard.html # Analyst dashboard to view startups │ 
+│ ├── analyst/│  
+│ ├── dashboard.html # Analyst dashboard to view startups │   
 │ ├── profile.html 
 
 #unit tests          
 ├── tests/     
 │   ├── test_PEP_API.py         
 │   ├── test_app.py             
-│   ├── test_data_value_check.py
-│   ├── test_startup_data_management.py
+│   ├── test_data_value_check.py  
+│   ├── test_startup_data_management.py 
 # Sample report     
 #sample report     
-└── reports/
+└── reports/  
     └── compliance_report.pdf  
 
 
