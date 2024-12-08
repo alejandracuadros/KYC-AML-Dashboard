@@ -36,7 +36,7 @@ Setup Instructions:
    - MySQL
    - Pandas
    - Streamlit
-4. Set up the database using the SQL scripts in the `sql/` directory.
+4. Set up the database using the SQL scripts.
 
   
 
@@ -65,53 +65,3 @@ Frontend for Analysts
 
 Data Privacy and GDPR compliance
 Even though this is a student project, it will adhere to GDPR requirements to ensure the secure and lawful handling of personal data. 
-
-Directory Structure
-
-project_root/
-#SQL schema
-├── sql/  
-│   ├── create_tables.sql      
-│   ├── insert_data.sql        
-│   ├── queries.sql           
- # High-risk country data and # Placeholder for PEPs
-
-├── data/  
-│   ├── high_risk_countries.txt  
-│   └── pep_list_placeholder.txt
-
-# Requirements and objectives
-
-├── docs/  
-│   ├── requirements.md         
-│   └── compliance_guidelines.pdf
-# Eligibility checks, AML checks connections with SQL
-├── scripts/  
-│   ├── eligibility_checks.py  
-│   ├── aml_compliance.py       
-│   ├── database_connector.py   
-│   ├── app.py        
-# Frontend for startups
-├── frontend/ # Frontend components  
-│ ├── startup/ │  
-│ ├── register.html  
-│ │ ├── status.html
-
-# Frontend for analysts showing the startup profile 
-
-│ ├── analyst/│  
-│ ├── dashboard.html # Analyst dashboard to view startups │   
-│ ├── profile.html 
-
-#unit tests          
-├── tests/     
-│   ├── test_PEP_API.py         
-│   ├── test_app.py             
-│   ├── test_data_value_check.py  
-│   ├── test_startup_data_management.py 
-# Sample report     
-#sample report     
-└── reports/  
-    └── compliance_report.pdf  
-
-
