@@ -1,6 +1,6 @@
 # Configuration settings for database connection
 # Update the parameters with your database credentials
 
-HOST = "localhost"
-USER = "root"
-PASSWORD = "#Almeja1997."
+HOST = "HOST"
+USER = "USER"
+PASSWORD = "PASSWORD"
