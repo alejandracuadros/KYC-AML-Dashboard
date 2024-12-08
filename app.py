@@ -2,7 +2,8 @@ import datetime
 from datetime import date
 import pandas as pd
 import streamlit as st
-import pycountry
+import pycountry # type: ignore
+from add_to_database import add_to_startups, add_to_board_members, add_to_founders_details, add_to_investors, add_to_startup_profile, add_to_sustainability  # type: ignore
 
 # Function to inject custom CSS
 def inject_css():
@@ -53,7 +54,7 @@ if "logged_in" not in st.session_state:
 # Login function
 @st.cache_data
 def load_credentials():
-    return pd.read_csv('login_credentials.csv')
+    return pd.read_csv("login_credentials.csv")
 
 credentials = load_credentials()
 
@@ -682,6 +683,7 @@ else:
                 st.error("The following fields are missing in this section:\n\n" + "\n".join(
                     f"- {field}" for field in section_missing_fields))
             else:
+                
                 st.success("This section's data has been successfully validated!")
 
     elif selected_section == "Risk and Compliance":
@@ -970,5 +972,11 @@ else:
                         key not in ["selected_section", "logged_in", "missing_fields"]}
                 df = pd.DataFrame([data])
                 df.to_csv("submission_data.csv", index=False)
+                add_to_startups(st.session_state)
+                add_to_founders_details(st.session_state)
+                add_to_startup_profile(st.session_state)
+                add_to_investors(st.session_state)
+                add_to_board_members(st.session_state)
+                add_to_sustainability(st.session_state)
                 st.success("All sections are complete! Your data has been successfully submitted and saved!")
 

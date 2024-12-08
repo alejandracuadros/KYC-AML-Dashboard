@@ -1,7 +1,6 @@
+from db_utils import _connect_to_db, close_db_connection
 # check if in there are any empty (NULL) values in a given column in a specific table in a database
 #The goal of this function, is to make sure that all the information are complete, since these are critical when comes to AML/KYC checking
-
-
 
 def validate_data(field_name, value, expected_type):
     if not isinstance(value, str) or any(char.isdigit() for char in value):
@@ -17,6 +16,7 @@ def validate_data(field_name, value, expected_type):
             except ValueError:
                 raise ValueError(f"{field_name} should be a valid date. Invalid value: {value}")
             return True
+        
 # Check for invalid date ranges in the PEP table
 def check_invalid_date_rages(connection):
     try:
@@ -43,9 +43,8 @@ def ensure_not_null(field_name, value):
     return True
 
 # This funcion can be used to check in a specific column in a specific table
-def check_null_values(table_name, column_name):
+def check_null_values(connection,table_name, column_name):
     try:
-        #I use paid Pycharm, so if you dont please make sure that is a connection with the database before running this code
         cursor = connection.cursor()
         query = f"SELECT COUNT(*) FROM {table_name} WHERE {column_name} IS NULL"
         cursor.execute(query)
@@ -98,3 +97,26 @@ def check_eu_countries_blacklist(connection,country):
             print(f"The country {country} is not classified as high risk.")
     except Exception as e:
         print(f" There is an error while checking: {e}")
+
+
+def main():
+    db_connection = None
+    try:
+        db_name = 'regulatory_compliance'
+        db_connection = _connect_to_db(db_name)
+        cur = db_connection.cursor()
+        print(f"Connected to DB: {db_name}")
+        
+        check_null_values(db_connection,"high_risk_countries","country_name")
+        
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+    finally:
+        if db_connection is not None:
+            close_db_connection(db_connection)
+
+
+if __name__ == '__main__':
+    main()
