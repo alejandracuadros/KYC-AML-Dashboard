@@ -3,57 +3,57 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 import pycountry
-from add_to_database import DatabaseConnection  # type: ignore
+# from add_to_database import DatabaseConnection  # type: ignore
 
-db = DatabaseConnection()
+# db = DatabaseConnection()
 
 # Login function
 @st.cache_data
 def load_credentials():
     return pd.read_csv("login_credentials.csv")
 
-def inject_css():
-        st.markdown(
-            """
-            <style>
-            
-            /* Change the text color */
-            h1, h2, h3, h4, h5, h6, body, p, li {
-                color: #FFFFFF;
-            }
 
-            .stAppHeader {
-                background-color: #021021;
-                font-family: 'Arial', sans-serif;
-            }
-            
-            /* Change the main background color */
-            .stApp {
-                background-color: #021021;
-                font-family: 'Arial', sans-serif;  
-            }
-            
-            /* Change sidebar background color */
-            .stSidebar { 
-                background-color: #05254F; 
-                color: white ; 
-                font-family: 'Arial', sans-serif;
-            }
-    
-            /* Customize submit button */
-            button {
-                background-color: #073470 !important;
-                color: white !important;
-                font-family: 'Arial', sans-serif; 
-            }
-            button:hover {
-                background-color: #135F91 !important; 
-            }
-    
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+# Styling of the app
+def inject_css():
+    st.markdown(
+        """
+        <style>
+
+        /* Change the header color */
+        .stAppHeader {
+            background-color: #021021;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Change the main background color */
+        .stApp {
+            background-color: #021021;
+            font-family: 'Arial', sans-serif;  
+        }
+
+        /* Change sidebar background color */
+        .stSidebar { 
+            background-color: #05254F; 
+            color: white ; 
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Customize submit button */
+        button {
+            background-color: #073470 !important;
+            color: white !important;
+            font-family: 'Arial', sans-serif; 
+        }
+        button:hover {
+            background-color: #135F91 !important; 
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 inject_css()
 
 # Initialize session state variables
@@ -73,6 +73,7 @@ if not st.session_state["logged_in"]:
     # Login Form
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
+
 
     # Login callback function
     def login_callback(username, password):
@@ -138,6 +139,7 @@ else:
     if st.sidebar.button("Additional Documents"):
         st.session_state["selected_section"] = "Additional Documents"
     st.sidebar.markdown("<br>", unsafe_allow_html=True)
+
 
     # Logout callback function
     def logout_callback():
@@ -234,18 +236,11 @@ else:
         st.session_state.startup_name = st.text_input(
             "Startup Name",
             value=st.session_state.startup_name,
-
-            value = st.session_state.startup_name,
-
             placeholder="Enter your startup's official name"
         )
         st.session_state.registration_number = st.text_input(
             "Registration Number",
-
             value=st.session_state.registration_number,
-
-            value = st.session_state.registration_number,
-
             placeholder="Provide the registration ID of your startup"
         )
 
@@ -258,12 +253,8 @@ else:
             "Country of Incorporation",
             countries,
             index=countries.index(st.session_state.country_of_incorporation)
-
             if st.session_state.country_of_incorporation in countries
             else 0
-
-                if st.session_state.country_of_incorporation in countries
-                else 0
         )
 
         # Maximum date
@@ -368,6 +359,7 @@ else:
             "Chief Legal Officer (CLO)"
         ]
 
+
         # Function to render the form for a founder
         def render_founder_form(founder):
             st.subheader(f"Founder {founder['id']} Details")
@@ -458,13 +450,13 @@ else:
             if len(st.session_state.founders) > 1:
                 st.session_state.founders.pop()
 
+
         # Button to add another founder
         st.button("Add Another Founder", on_click=add_founder)
 
         # Button to remove the last founder
         if len(st.session_state.founders) > 1:
             st.button("Remove Last Founder", on_click=remove_founder)
-
 
         # Final review for submission
         # Fields for this section
@@ -697,6 +689,7 @@ else:
                 st.error("The following fields are missing in this section:\n\n" + "\n".join(
                     f"- {field}" for field in section_missing_fields))
             else:
+
                 st.success("This section's data has been successfully validated!")
 
     elif selected_section == "Risk and Compliance":
@@ -945,12 +938,10 @@ else:
                 st.error("Some fields are still missing:\n\n" + "\n".join(all_missing_fields))
             else:
                 # Save all data to CSV
-
                 data = {key: st.session_state[key] for key in st.session_state if
                         key not in ["selected_section", "logged_in", "missing_fields"]}
                 df = pd.DataFrame([data])
                 df.to_csv("submission_data.csv", index=False)
-                
                 db.add_to_startups(st.session_state)
                 db.add_to_founders_details(st.session_state)
                 db.add_to_startup_profile(st.session_state)
