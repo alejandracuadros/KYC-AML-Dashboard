@@ -116,8 +116,8 @@ st.markdown(
 
 USER_CREDENTIALS = {
     "admin": "#password123",
-    "user1": "#welcome123",
-    "user2": "#securepass123",
+    "analyst1": "#welcome123",
+    "analyst2": "#securepass123",
 }
 
 # Login function
