@@ -2,18 +2,7 @@ import datetime
 from datetime import date
 import pandas as pd
 import streamlit as st
-import pycountry
-import json
-from add_to_database import DatabaseConnection  # type: ignore
 
-db = DatabaseConnection()
-
-# Login function
-@st.cache_data
-def load_credentials():
-    return pd.read_csv("login_credentials.csv")
-
-# Styling of the app
 def inject_css():
         st.markdown(
             """
@@ -930,22 +919,5 @@ else:
                 st.error("Some fields are still missing:\n\n" + "\n".join(all_missing_fields))
             else:
                 # Save all data to CSV
-                data = {
-                    key: st.session_state[key]
-                    for key in st.session_state
-                    if key not in ["selected_section", "logged_in", "missing_fields"]
-                }
-
-                # Write the dictionary to a JSON file
-                with open("submission_data.json", "w") as json_file:
-                    json.dump(data, json_file, indent=4)
-
-                # db.add_to_startups(st.session_state)
-                # db.add_to_founders_details(st.session_state)
-                # db.add_to_startup_profile(st.session_state)
-                # db.add_to_investors(st.session_state)
-                # db.add_to_board_members(st.session_state)
-                # db.add_to_sustainability(st.session_state)
-                # db.close_connection()
                 st.success("All sections are complete! Your data has been successfully submitted and saved!")
 
