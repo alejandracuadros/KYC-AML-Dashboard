@@ -2,10 +2,18 @@ import datetime
 from datetime import date
 import pandas as pd
 import streamlit as st
-import pycountry # type: ignore
-from add_to_database import add_to_startups, add_to_board_members, add_to_founders_details, add_to_investors, add_to_startup_profile, add_to_sustainability  # type: ignore
+import pycountry
+import json
+from add_to_database import DatabaseConnection  # type: ignore
 
-# Function to inject custom CSS
+db = DatabaseConnection()
+
+# Login function
+@st.cache_data
+def load_credentials():
+    return pd.read_csv("login_credentials.csv")
+
+# Styling of the app
 def inject_css():
         st.markdown(
             """
@@ -44,22 +52,18 @@ def inject_css():
             """,
             unsafe_allow_html=True
         )
-
 inject_css()
 
 # Initialize session state variables
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
-# Login function
-@st.cache_data
-def load_credentials():
-    return pd.read_csv("login_credentials.csv")
 
 credentials = load_credentials()
 
-# Check if the user is already logged in
+# Check if the user is logged in
 if not st.session_state["logged_in"]:
+
     # Login Page
     st.title("Morgan Stanley Inclusive Venture Lab")
     st.subheader("Login to the Portal")
@@ -84,10 +88,8 @@ else:
 
     # Main Application
 
-    # Page Title
     st.title("Morgan Stanley Inclusive Venture Lab Submission")
 
-    # Sidebar menu
     st.sidebar.title("Navigate through sections:")
 
     # We use session state to store the selected section
@@ -165,8 +167,6 @@ else:
         "investors",
         "board_member_names",  # Risk and Compliance
         "criminal_record_declaration",
-        "proof_of_aml_compliance",
-        "bank_account_verification_doc",
         "sustainability_goals",  # Sustainability and Social Impact
         "environment_impact_description",
         "social_impact_contributions",
@@ -175,8 +175,7 @@ else:
     ]:
         if field not in st.session_state:
             # Initialize empty strings or appropriate defaults for each field
-            if field in ["proof_of_aml_compliance",
-                         "bank_account_verification_doc",
+            if field in ["social_impact_contributions",
                          "incorporation_proof",
                          "financial_statements"]:
                 st.session_state[field] = None
@@ -208,8 +207,6 @@ else:
         "Risk and Compliance": [
             "board_members",
             "criminal_record_agreement",
-            "proof_of_aml_compliance",
-            "bank_account_verification_doc"
         ],
         "Sustainability and Social Impact": [
             "sustainability_goals",
@@ -697,12 +694,6 @@ else:
         if "criminal_record_agreement" not in st.session_state:
             st.session_state["criminal_record_agreement"] = False
 
-        if "proof_of_aml_compliance" not in st.session_state:
-            st.session_state["proof_of_aml_compliance"] = None
-
-        if "bank_account_verification_doc" not in st.session_state:
-            st.session_state["bank_account_verification_doc"] = None
-
 
         # Callback to add a board member
         def add_board_member():
@@ -716,26 +707,29 @@ else:
                 st.session_state.board_members.pop()
 
 
-        # Render each board member form
+        # Render each board member form and synchronize session state
         def render_board_member_form(member):
-            st.text_input(
-                f"Board Member {member['id']} First Name",
+            member_id = member["id"]
+            first_name = st.text_input(
+                f"Board Member {member_id} First Name",
                 value=member.get("first_name", ""),
-                placeholder="Enter first name",
-                key=f"first_name_{member['id']}"
+                key=f"first_name_{member_id}"
             )
-            st.text_input(
-                f"Board Member {member['id']} Last Name",
+            last_name = st.text_input(
+                f"Board Member {member_id} Last Name",
                 value=member.get("last_name", ""),
-                placeholder="Enter last name",
-                key=f"last_name_{member['id']}"
+                key=f"last_name_{member_id}"
             )
-            st.text_input(
-                f"Board Member {member['id']} Passport/ID",
+            passport_id = st.text_input(
+                f"Board Member {member_id} Passport/ID",
                 value=member.get("passport_id", ""),
-                placeholder="Enter Passport or ID number",
-                key=f"passport_id_{member['id']}"
+                key=f"passport_id_{member_id}"
             )
+
+            # Update session state with current form values
+            member["first_name"] = first_name
+            member["last_name"] = last_name
+            member["passport_id"] = passport_id
 
 
         # Render forms for all board members
@@ -758,27 +752,10 @@ else:
         st.text_area("Declaration", value=declaration_text, height=100, disabled=True)
 
         # Checkbox for Agreement
-        if "criminal_record_agreement" not in st.session_state:
-            st.session_state["criminal_record_agreement"] = False
-
         st.session_state["criminal_record_agreement"] = st.checkbox(
             "I agree to the above declaration and confirm that it is accurate.",
             value=st.session_state["criminal_record_agreement"],
             key="criminal_record_agreement_checkbox"
-        )
-
-        # AML-Related Documents
-        st.subheader("AML-Related Documents")
-
-        st.file_uploader(
-            "Upload Proof of AML Compliance (PDF)",
-            type=["pdf"],
-            key="proof_of_aml_compliance"
-        )
-        st.file_uploader(
-            "Upload Bank Account Verification Document (PDF)",
-            type=["pdf"],
-            key="bank_account_verification_doc"
         )
 
         # Submit Section Button
@@ -786,29 +763,23 @@ else:
             section_missing_fields = []
 
             # Validate board members
-            for i, member in enumerate(st.session_state.get("board_members", [])):
-                if not st.session_state.get(f"first_name_{member['id']}"):
+            for i, member in enumerate(st.session_state.board_members):
+                if not member.get("first_name"):
                     section_missing_fields.append(f"Board Member {i + 1} First Name")
-                if not st.session_state.get(f"last_name_{member['id']}"):
+                if not member.get("last_name"):
                     section_missing_fields.append(f"Board Member {i + 1} Last Name")
-                if not st.session_state.get(f"passport_id_{member['id']}"):
+                if not member.get("passport_id"):
                     section_missing_fields.append(f"Board Member {i + 1} Passport/ID")
 
-            # Validate other fields
-            if not st.session_state.get("criminal_record_agreement"):
+            # Validate criminal record agreement
+            if not st.session_state["criminal_record_agreement"]:
                 section_missing_fields.append("Criminal record agreement")
-            if not st.session_state.get("proof_of_aml_compliance"):
-                section_missing_fields.append("Proof of aml compliance")
-            if not st.session_state.get("bank_account_verification_doc"):
-                section_missing_fields.append("Bank account verification doc")
-
-            # Update missing fields dictionary
-            st.session_state.missing_fields["Risk and Compliance"] = section_missing_fields
 
             # Provide feedback
             if section_missing_fields:
-                st.error("The following fields are missing in this section:\n\n" + "\n".join(
-                    f"- {field}" for field in section_missing_fields))
+                st.error(
+                    "The following fields are missing in this section:\n\n" +
+                    "\n".join(f"- {field}" for field in section_missing_fields))
             else:
                 st.success("This section's data has been successfully validated!")
 
@@ -857,74 +828,64 @@ else:
             "Advocate for Human Rights"
         ]
 
-        # Ensure session state is initialized with valid values
-        if "sustainability_goals" not in st.session_state:
-            st.session_state.sustainability_goals = []
-        if "environment_impact_description" not in st.session_state:
-            st.session_state.environment_impact_description = []
-        if "social_impact_contributions" not in st.session_state:
-            st.session_state.social_impact_contributions = []
-
-        # Validate session state defaults to ensure they are part of the options
-        st.session_state.sustainability_goals = [
-            goal for goal in st.session_state.sustainability_goals if
-            goal in sustainability_goals_options
-        ]
-        st.session_state.environment_impact_description = [
-            impact for impact in
-            st.session_state.environment_impact_description if
-            impact in environmental_impact_options
-        ]
-        st.session_state.social_impact_contributions = [
-            contribution for contribution in
-            st.session_state.social_impact_contributions if
-            contribution in social_contribution_options
-        ]
+        # Ensure session state is initialized with valid default values
+        if "sustainability_goals" not in st.session_state or st.session_state[
+            "sustainability_goals"] not in sustainability_goals_options:
+            st.session_state["sustainability_goals"] = "None"
+        if "environment_impact_description" not in st.session_state or st.session_state[
+            "environment_impact_description"] not in environmental_impact_options:
+            st.session_state["environment_impact_description"] = "None"
+        if "social_impact_contributions" not in st.session_state or st.session_state[
+            "social_impact_contributions"] not in social_contribution_options:
+            st.session_state["social_impact_contributions"] = "None"
 
         # Sustainability Goals
-        st.multiselect(
-            "Sustainability Goals",
+        sustainability_goal = st.selectbox(
+            "Sustainability Goal",
             options=sustainability_goals_options,
-            default=st.session_state.sustainability_goals,
-            key="sustainability_goals"
+            index=sustainability_goals_options.index(st.session_state["sustainability_goals"]) if st.session_state[
+                                                                                                      "sustainability_goals"] in sustainability_goals_options else 0,
+            key="sustainability_goals_select",
         )
+        st.session_state["sustainability_goals"] = sustainability_goal
 
         # Environmental Impact
-        st.multiselect(
+        environmental_impact = st.selectbox(
             "Environmental Impact",
             options=environmental_impact_options,
-            default=st.session_state.environment_impact_description,
-            key="environment_impact_description"
+            index=environmental_impact_options.index(st.session_state["environment_impact_description"]) if
+            st.session_state["environment_impact_description"] in environmental_impact_options else 0,
+            key="environment_impact_select",
         )
+        st.session_state["environment_impact_description"] = environmental_impact
 
         # Social Contributions
-        st.multiselect(
-            "Social Contributions",
+        social_contribution = st.selectbox(
+            "Social Contribution",
             options=social_contribution_options,
-            default=st.session_state.social_impact_contributions,
-            key="social_impact_contributions"
+            index=social_contribution_options.index(st.session_state["social_impact_contributions"]) if
+            st.session_state["social_impact_contributions"] in social_contribution_options else 0,
+            key="social_contributions_select",
         )
+        st.session_state["social_impact_contributions"] = social_contribution
 
         # Final Check
-        # Missing Fields
         if st.button("Submit Section"):
             section_missing_fields = []
 
             # Validate the fields in this section
-            if not st.session_state.get("sustainability_goals"):
-                section_missing_fields.append("Sustainability Goals")
-            if not st.session_state.get("environment_impact_description"):
+            if st.session_state["sustainability_goals"] == "None":
+                section_missing_fields.append("Sustainability Goal")
+            if st.session_state["environment_impact_description"] == "None":
                 section_missing_fields.append("Environmental Impact")
-            if not st.session_state.get("social_impact_contributions"):
-                section_missing_fields.append("Social Contributions")
-
-            # Update the missing fields dictionary
-            st.session_state.missing_fields["Sustainability and Social Impact"] = section_missing_fields
+            if st.session_state["social_impact_contributions"] == "None":
+                section_missing_fields.append("Social Contribution")
 
             # Provide feedback
             if section_missing_fields:
-                st.error("The following fields are missing in this section:\n\n" + "\n".join(
-                    f"- {field}" for field in section_missing_fields))
+                st.error(
+                    "The following fields are missing or incomplete:\n\n"
+                    + "\n".join(f"- {field}" for field in section_missing_fields))
             else:
                 st.success("This section's data has been successfully validated!")
 
@@ -969,15 +930,22 @@ else:
                 st.error("Some fields are still missing:\n\n" + "\n".join(all_missing_fields))
             else:
                 # Save all data to CSV
-                data = {key: st.session_state[key] for key in st.session_state if
-                        key not in ["selected_section", "logged_in", "missing_fields"]}
-                df = pd.DataFrame([data])
-                df.to_csv("submission_data.csv", index=False)
-                add_to_startups(st.session_state)
-                add_to_founders_details(st.session_state)
-                add_to_startup_profile(st.session_state)
-                add_to_investors(st.session_state)
-                add_to_board_members(st.session_state)
-                add_to_sustainability(st.session_state)
+                data = {
+                    key: st.session_state[key]
+                    for key in st.session_state
+                    if key not in ["selected_section", "logged_in", "missing_fields"]
+                }
+
+                # Write the dictionary to a JSON file
+                with open("submission_data.json", "w") as json_file:
+                    json.dump(data, json_file, indent=4)
+
+                # db.add_to_startups(st.session_state)
+                # db.add_to_founders_details(st.session_state)
+                # db.add_to_startup_profile(st.session_state)
+                # db.add_to_investors(st.session_state)
+                # db.add_to_board_members(st.session_state)
+                # db.add_to_sustainability(st.session_state)
+                # db.close_connection()
                 st.success("All sections are complete! Your data has been successfully submitted and saved!")
 
