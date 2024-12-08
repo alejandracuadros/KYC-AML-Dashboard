@@ -266,7 +266,8 @@ else:
             try:
                 default_date = datetime.date.fromisoformat(default_date)
             except ValueError:
-                default_date = datetime.date.today()
+                pass
+            default_date = datetime.date.today()
 
         # Ensure default_date doesn't exceed max_date
         default_date = min(default_date, max_date)

@@ -31,11 +31,11 @@ Setup Instructions:
 1. Install Python 3.x above.
 2. Install the required libraries from the `requirements.txt` file using the command below:
    `pip install -r requirements.txt`
-4. Ensure you have the following dependencies:
-- Flask
-- MySQL
-- Pandas
-- Streamlit
+3. Ensure you have the following dependencies:
+   - Flask
+   - MySQL
+   - Pandas
+   - Streamlit
 4. Set up the database using the SQL scripts in the `sql/` directory.
 
   

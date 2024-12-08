@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from db_utils import _connect_to_db, close_db_connection
-from st_aggrid import AgGrid
 import numpy as np
 
 # Set up Streamlit page
@@ -16,33 +15,27 @@ st.markdown(
     }
 
     .stApp {
-        background-color: #05254F; 
-        font-family: 'Arial', sans-serif;  
-        color: #003366; 
+        background-color: #05254F;
+        font-family: 'Arial', sans-serif;
+        color: #003366;
     }
-        
-    .stSidebar { 
-        background-color: #05254F; 
-        color: white ; 
+
+    .stSidebar {
+        background-color: #05254F;
+        color: white ;
         font-family: 'Arial', sans-serif;
     }
     button {
             background-color: #073470 !important;
             color: white !important;
-            font-family: 'Arial', sans-serif; 
+            font-family: 'Arial', sans-serif;
         }
     button:hover {
-        background-color: #135F91 !important; 
-    }
-    /* Titles and subtitles */
-    h1, h2, h3, h4, h5, h6 {
-        color: #FFFFFF; /* Light blue */
-        font-family: 'Arial', sans-serif;
+        background-color: #135F91 !important;
     }
 
-    /* Customize metric containers */
     .metric-container {
-        background-color: #05254F; /* Light gray for contrast */
+        background-color: #05254F; 
         flex-direction: column;
         justify-content: center;
         align-items: center;
@@ -52,8 +45,8 @@ st.markdown(
         display: flex;
         border-radius: 10px;
         margin-bottom: 15px;
-        border: 0.5px solid #7F7F7F; 
-        
+        border: 0.5px solid #7F7F7F;
+
     }
     .metric-title {
         color: #FFFFFF; /* Dark blue */
@@ -86,31 +79,30 @@ st.markdown(
         width: 8px;
     }
     ::-webkit-scrollbar-thumb {
-        background: #0071CE; /* Light blue */
+        background: #0071CE; 
         border-radius: 10px;
     }
     ::-webkit-scrollbar-track {
-        background: #003366; /* Dark blue */
+        background: #003366;
     }
 
     /* Table customization */
     .dataframe {
-        border: 2px solid #0071CE; /* Table border matches branding */
+        border: 2px solid #0071CE;
         border-radius: 10px;
         overflow: hidden;
     }
 
-    /* Interactive elements like buttons */
     .stButton button {
-        background-color: #003366; /* Dark blue */
-        color: #FFFFFF; /* White text */
+        background-color: #003366; 
+        color: #FFFFFF; /
         border-radius: 5px;
         font-size: 16px;
         font-weight: bold;
         border: none;
     }
     .stButton button:hover {
-        background-color: #0071CE; /* Light blue on hover */
+        background-color: #0071CE; 
         color: #FFFFFF;
     }
     </style>
@@ -123,22 +115,31 @@ st.markdown(
 def fetch_data(query):
     connection = _connect_to_db("regulatory_compliance")
     try:
+        # st.info("Connecting to the database...")
+        # print("Connecting to the database...")
         data = pd.read_sql(query, connection)
+        # st.success("Data fetched successfully!")
+        # print("Data fetched successfully!")
         return data
     except Exception as e:
         st.error(f"Error fetching data: {e}")
+        # print(f"Error fetching data: {e}")
         return pd.DataFrame()
     finally:
         close_db_connection(connection)
+        # st.info("Database connection closed.")
+        # print("Database connection closed.")
 
 # Fetch required data
 startups_query = "SELECT * FROM startups;"
+startups_data = fetch_data(startups_query)
+# st.write(startups_data)
 profiles_query = "SELECT * FROM startup_profile;"
 startups_data = fetch_data(startups_query)
 profiles_data = fetch_data(profiles_query)
 
 
-# Sidebar menu using buttons
+# Sidebar Menu
 st.sidebar.title("Choose Dashboard View:")
 if "menu_option" not in st.session_state:
     st.session_state.menu_option = "All Startups"  # Default view
@@ -158,9 +159,7 @@ if menu_option == "All Startups":
     if not startups_data.empty and not profiles_data.empty:
         merged_data = startups_data.merge(profiles_data, on="startup_id", how="left")
 
-        # Layout: Centered Summary Metrics
-        # st.subheader(" ")
-
+        # Metrics
         # Create columns for metrics
         col1, col2, col3, col4 = st.columns(4)
 
@@ -216,7 +215,7 @@ if menu_option == "All Startups":
                 color="amount_raised",
                 title="Geographical Hotspots for Fundraising",
                 labels={"amount_raised": "Total Raised ($)"},
-                color_continuous_scale=px.colors.sequential.Plasma,
+                color_continuous_scale=px.colors.sequential.Cividis,
             )
             # Set background color, adjust map scale, and position the color scale horizontally
             fig1.update_layout(
@@ -422,8 +421,10 @@ if menu_option == "All Startups":
             st.plotly_chart(fig9, use_container_width=True)
 
         # Interactive Data Table
+        # Detailed Data Table
         st.markdown("### Detailed Data")
-        AgGrid(merged_data, height=300, fit_columns_on_grid_load=True)
+
+        st.dataframe(merged_data, height=300)
 
 elif menu_option == "Startup-Specific Insights":
     st.header("Startup-Specific Insights")
@@ -533,6 +534,7 @@ elif menu_option == "Startup-Specific Insights":
                 "</div>",
                 unsafe_allow_html=True,
             )
+
 
 
 
