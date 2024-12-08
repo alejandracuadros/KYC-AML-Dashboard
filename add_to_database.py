@@ -1,169 +1,115 @@
 from db_utils import _connect_to_db, close_db_connection, DbConnectionError
 
-def add_to_startups(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
+class DatabaseConnection:
 
+    def __init__(self, db_name='regulatory_compliance'):
+        try:
+            self.db_name = db_name
+            self.db_connection = _connect_to_db(self.db_name)
+            self.cur = self.db_connection.cursor()
+            print(f"Connected to DB: {self.db_name}")
+        except Exception as e:
+            raise DbConnectionError("Failed to connect to database: {}".format(e))
         
-        query = """
-        INSERT INTO startups (startup_id, startup_name, country, date_of_incorporation, company_size, employees)
-        VALUES
-        ({},'{}','{}','{}','{}',{});  
-        """.format(st_data.registration_number,st_data.startup_name,st_data.country_of_incorporation,st_data.date_of_incorporation,
-                   st_data.company_size,st_data.number_employees)
-
-        cur.execute(query)
-        db_connection.commit()
-        cur.close()
-
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - startups")
-
-    finally:
-        if db_connection:
-            db_connection.close()
-            print("DB connection is closed")
-
-
-def add_to_founders_details(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
-
-        for founder in st_data.founders:
-            query = """
-            INSERT INTO founders_details (passport_id, full_name, date_of_birth, nationality, birth_place, residence_place, gender, phone_number, 
-            email, startup_id, role_in_startup)
-            VALUES
-            ('{}','{}','{}','{}','{}','{}','{}','{}','{}',{},'{}'); 
-            """.format(founder['passport_number'],founder['first_name']+" "+founder['last_name'],founder['date_of_birth'],
-                       founder['nationality'],founder['place_of_birth'],founder['place_of_residence'],founder['gender'],
-                       founder['phone_number'],founder['email'],st_data.registration_number,founder['role'])
-
-            cur.execute(query)
-        db_connection.commit()
-        cur.close()
-
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - founders_details")
-
-    finally:
-        if db_connection:
-            db_connection.close()
-            print("DB connection is closed")
-
-
-def add_to_startup_profile(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
-
+    def execute_query(self, query, data):
+        try:
+            self.cur.execute(query,data)
+            self.db_connection.commit()
+        except Exception as e:
+            self.db_connection.rollback()
+            raise DbConnectionError("Error executing query: {}".format(e))
         
-        query = """
-        INSERT INTO startup_profile (startup_id, industry, last_year_revenue, current_projected_revenue, next_year_revenue, 
-        amount_raised)
-        VALUES
-        ({},'{}',{},{},{},{})  
-        """.format(st_data.registration_number,st_data.industry,st_data.last_year_revenue,st_data.current_projected_revenue,
-                   st_data.next_year_revenue,st_data.amount_raised)
-
-        cur.execute(query)
-        db_connection.commit()
-        cur.close()
-
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - startup_profile")
-
-    finally:
-        if db_connection:
-            db_connection.close()
+    def close_connection(self):
+        if self.cur:
+            self.cur.close()
+        if self.db_connection:
+            close_db_connection(self.db_connection)
             print("DB connection is closed")
 
 
-def add_to_investors(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
-
-        for investor in st_data.investors:
+    def add_to_startups(self, st_data):
+            
             query = """
-            INSERT INTO investors (startup_id, investor_name, passport_id)
+            INSERT INTO startups (startup_id, startup_name, country, date_of_incorporation, company_size, employees)
             VALUES
-            ({},'{}','{}')  
-            """.format(st_data.registration_number,investor['first_name']+" "+investor['last_name'],investor['passport_id'])
-
-            cur.execute(query)
-        db_connection.commit()
-        cur.close()
-
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - investors")
-
-    finally:
-        if db_connection:
-            db_connection.close()
-            print("DB connection is closed")
+            (%s,%s,%s,%s,%s,%s);  
+            """
+            data= (st_data.registration_number,st_data.startup_name,st_data.country_of_incorporation,st_data.date_of_incorporation,
+                    st_data.company_size,st_data.number_employees)
+            
+            self.execute_query(query,data)
 
 
-def add_to_board_members(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
 
-        for member in st_data.board_members:
+    def add_to_founders_details(self, st_data):
+
+            for founder in st_data.founders:
+                query = """
+                INSERT INTO founders_details (passport_id, full_name, date_of_birth, nationality, birth_place, residence_place, gender, phone_number, 
+                email, startup_id, role_in_startup)
+                VALUES
+                (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+                """
+                data=(founder['passport_number'],founder['first_name']+" "+founder['last_name'],founder['date_of_birth'],
+                        founder['nationality'],founder['place_of_birth'],founder['place_of_residence'],founder['gender'],
+                        founder['phone_number'],founder['email'],st_data.registration_number,founder['role'])
+
+                self.execute_query(query,data)
+
+
+
+    def add_to_startup_profile(self, st_data):
+        
             query = """
-            INSERT INTO board_members (startup_id, member_name, passport_id)
+            INSERT INTO startup_profile (startup_id, industry, last_year_revenue, current_projected_revenue, next_year_revenue, 
+            amount_raised)
             VALUES
-            ({},'{}','{}')  
-            """.format(st_data.registration_number,member['first_name']+" "+member['last_name'],
-                    member['passport_id'])
+            (%s,%s,%s,%s,%s,%s)  
+            """
+            data = (st_data.registration_number,st_data.industry,st_data.last_year_revenue,st_data.current_projected_revenue,
+                    st_data.next_year_revenue,st_data.amount_raised)
 
-            cur.execute(query)
-        db_connection.commit()
-        cur.close()
+            self.execute_query(query,data)
 
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - board_members")
+    
+    
+    def add_to_investors(self, st_data):
 
-    finally:
-        if db_connection:
-            db_connection.close()
-            print("DB connection is closed")
+            for investor in st_data.investors:
+                query = """
+                INSERT INTO investors (startup_id, investor_name, passport_id)
+                VALUES
+                (%s,%s,%s)  
+                """
+                data=(st_data.registration_number,investor['first_name']+" "+investor['last_name'],investor['passport_id'])
+
+                self.execute_query(query,data)
 
 
-def add_to_sustainability(st_data):
-    try:
-        db_name = 'regulatory_compliance'
-        db_connection = _connect_to_db(db_name)
-        cur = db_connection.cursor()
-        print(f"Connected to DB: {db_name}")
+    
+    def add_to_board_members(self, st_data):
+    
+            for member in st_data.board_members:
+                query = """
+                INSERT INTO board_members (startup_id, member_name, passport_id)
+                VALUES
+                (%s,%s,%s)  
+                """
+                data=(st_data.registration_number,member['first_name']+" "+member['last_name'],
+                        member['passport_id'])
 
-        query = """
-        INSERT INTO sustainability (startup_id, goals, impact, social_contribution)
-        VALUES
-        ({},'{}','{}','{}')  
-        """.format(st_data.registration_number,st_data.sustainability_goals,st_data.environment_impact_description,
-                    st_data.social_impact_contributions)
+                self.execute_query(query,data)
 
-        cur.execute(query)
-        db_connection.commit()
-        cur.close()
+    
+    
+    def add_to_sustainability(self, st_data):
+            
+            query = """
+            INSERT INTO sustainability (startup_id, goals, impact, social_contribution)
+            VALUES
+            (%s,%s,%s,%s)  
+            """
+            data=(st_data.registration_number,st_data.sustainability_goals,st_data.environment_impact_description,
+                        st_data.social_impact_contributions)
 
-    except Exception:
-        raise DbConnectionError("Failed to read data from regulatory_compliance - sustainability")
-
-    finally:
-        if db_connection:
-            db_connection.close()
-            print("DB connection is closed")
+            self.execute_query(query,data)

@@ -3,8 +3,9 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 import pycountry # type: ignore
-from add_to_database import add_to_startups, add_to_board_members, add_to_founders_details, add_to_investors, add_to_startup_profile, add_to_sustainability  # type: ignore
+from add_to_database import DatabaseConnection # type: ignore
 
+db = DatabaseConnection()
 # Function to inject custom CSS
 def inject_css():
         st.markdown(
@@ -973,11 +974,12 @@ else:
                         key not in ["selected_section", "logged_in", "missing_fields"]}
                 df = pd.DataFrame([data])
                 df.to_csv("submission_data.csv", index=False)
-                add_to_startups(st.session_state)
-                add_to_founders_details(st.session_state)
-                add_to_startup_profile(st.session_state)
-                add_to_investors(st.session_state)
-                add_to_board_members(st.session_state)
-                add_to_sustainability(st.session_state)
+                db.add_to_startups(st.session_state)
+                db.add_to_founders_details(st.session_state)
+                db.add_to_startup_profile(st.session_state)
+                db.add_to_investors(st.session_state)
+                db.add_to_board_members(st.session_state)
+                db.add_to_sustainability(st.session_state)
+                db.close_connection()
                 st.success("All sections are complete! Your data has been successfully submitted and saved!")
 
