@@ -2,6 +2,59 @@ import datetime
 from datetime import date
 import pandas as pd
 import streamlit as st
+import pycountry
+from add_to_database import DatabaseConnection  # type: ignore
+
+db = DatabaseConnection()
+
+# Login function
+@st.cache_data
+def load_credentials():
+    return pd.read_csv("login_credentials.csv")
+
+
+# Styling of the app
+def inject_css():
+    st.markdown(
+        """
+        <style>
+
+        /* Change the header color */
+        .stAppHeader {
+            background-color: #021021;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Change the main background color */
+        .stApp {
+            background-color: #021021;
+            font-family: 'Arial', sans-serif;  
+        }
+
+        /* Change sidebar background color */
+        .stSidebar { 
+            background-color: #05254F; 
+            color: white ; 
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Customize submit button */
+        button {
+            background-color: #073470 !important;
+            color: white !important;
+            font-family: 'Arial', sans-serif; 
+        }
+        button:hover {
+            background-color: #135F91 !important; 
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+=======
 
 def inject_css():
         st.markdown(
@@ -47,7 +100,6 @@ inject_css()
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
-
 credentials = load_credentials()
 
 # Check if the user is logged in
@@ -69,6 +121,7 @@ if not st.session_state["logged_in"]:
             st.success("Login successful!")
         else:
             st.error("Invalid username or password. Please try again.")
+
 
     # Login button with callback
     st.button("Login", on_click=login_callback, args=(username, password))
@@ -92,17 +145,17 @@ else:
             """
             This portal helps startups submit their information for evaluation as part of the 
             Morgan Stanley Inclusive Venture Lab initiative.
-    
+
             ### Here's what you can do:
             - Navigate through the sections on the left sidebar.
             - Provide details about your startup, founders, and business operations.
             - Upload relevant documents to complete your submission.
-    
+
             ### How to Use:
             1. Start with **Startup Information** to provide basic details.
             2. Proceed through each section using the sidebar menu.
             3. Submit your completed application by clicking the **Submit** button.
-    
+
             **Ready to get started? Click on a section in the sidebar!**
             """,
             unsafe_allow_html=True,
@@ -130,6 +183,7 @@ else:
     def logout_callback():
         st.session_state["logged_in"] = False
         st.info("Logged out successfully.")
+
 
     # Logout button with callback
     st.sidebar.button("Log Out", on_click=logout_callback)
@@ -219,12 +273,19 @@ else:
 
         st.session_state.startup_name = st.text_input(
             "Startup Name",
+            value=st.session_state.startup_name,
+
             value = st.session_state.startup_name,
+
             placeholder="Enter your startup's official name"
         )
         st.session_state.registration_number = st.text_input(
             "Registration Number",
+
+            value=st.session_state.registration_number,
+
             value = st.session_state.registration_number,
+
             placeholder="Provide the registration ID of your startup"
         )
 
@@ -237,6 +298,10 @@ else:
             "Country of Incorporation",
             countries,
             index=countries.index(st.session_state.country_of_incorporation)
+
+            if st.session_state.country_of_incorporation in countries
+            else 0
+
                 if st.session_state.country_of_incorporation in countries
                 else 0
         )
@@ -269,7 +334,10 @@ else:
                                 "Small Enterprise (10-49 employees)": (10, 49),
                                 "Medium Enterprise (50-249 employees)": (50, 249),
                                 "Large Enterprise (250 or more employees)": (250, float('inf'))
+                                }
+
         }
+
 
         if "company_size" not in st.session_state:
             st.session_state.company_size = list(company_size_options.keys())[0]
@@ -426,6 +494,7 @@ else:
         def add_founder():
             new_id = len(st.session_state.founders) + 1
             st.session_state.founders.append({"id": new_id})
+
 
         # Callback function to remove the last founder
         def remove_founder():
@@ -629,6 +698,7 @@ else:
                     key=f"contact_person_{investor['id']}"
                 )
 
+
         # Render all investors
         for investor in st.session_state.investors:
             render_investor_input(investor)
@@ -670,7 +740,6 @@ else:
                 st.error("The following fields are missing in this section:\n\n" + "\n".join(
                     f"- {field}" for field in section_missing_fields))
             else:
-                
                 st.success("This section's data has been successfully validated!")
 
     elif selected_section == "Risk and Compliance":
@@ -919,5 +988,18 @@ else:
                 st.error("Some fields are still missing:\n\n" + "\n".join(all_missing_fields))
             else:
                 # Save all data to CSV
+
+                data = {key: st.session_state[key] for key in st.session_state if
+                        key not in ["selected_section", "logged_in", "missing_fields"]}
+                df = pd.DataFrame([data])
+                df.to_csv("submission_data.csv", index=False)
+                
+                db.add_to_startups(st.session_state)
+                db.add_to_founders_details(st.session_state)
+                db.add_to_startup_profile(st.session_state)
+                db.add_to_investors(st.session_state)
+                db.add_to_board_members(st.session_state)
+                db.add_to_sustainability(st.session_state)
+                db.close_connection()
                 st.success("All sections are complete! Your data has been successfully submitted and saved!")
 
