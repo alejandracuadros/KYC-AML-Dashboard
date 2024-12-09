@@ -39,7 +39,6 @@ Or if the startup is set up or operating in a high-risk third country.
    - Pandas
    - Streamlit
 4. Set up the database using the SQL scripts.
-   
    - Execute the next SQL Scripts:
      - [regulatory_compliance_data.sql](regulatory_compliance_data.sql)
    
