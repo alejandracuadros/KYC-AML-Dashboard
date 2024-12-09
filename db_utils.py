@@ -3,6 +3,7 @@ import mysql.connector
 from config import HOST, USER, PASSWORD
 
 
+
 # Exception to handle database connection errors
 class DbConnectionError(Exception):
     pass
