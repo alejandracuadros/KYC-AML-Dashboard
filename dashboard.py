@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from db_utils import _connect_to_db, close_db_connection
+
 import numpy as np
 
 # Set up Streamlit page
