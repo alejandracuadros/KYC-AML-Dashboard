@@ -75,3 +75,16 @@ During registration, it should identify if the founder/CEO is from a high-risk c
 
 ### Data Privacy and GDPR compliance
 Even though this is a student project, it will adhere to GDPR requirements to ensure the secure and lawful handling of personal data. 
+
+
+## Project Developers:
+- Alejandra Cuadros Rivas
+- Ana Carolina Bergamasco Perez
+- Clara Maria Barbosa Teodoro
+- Lilla Horváth
+- Bruna Rocha
+- Chiamaka Maria-Goretti Adinnu
+
+
+
+
