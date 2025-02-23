@@ -1,5 +1,4 @@
-# CFG-Group-project-group-3
-## Automated Eligibility and Compliance Checker
+# KYC/AML Regulatory Compliance Dashboard
 
 ## Project Description
 This project is an automated system designed to evaluate startups applying to Morgan Stanley's Inclusive Venture Lab. 
